@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { createRoom } from './api'; // Import from api.js
 
-function App() {
+const App = () => {
   const [formData, setFormData] = useState({
     selectedBot: 'default'
   });
@@ -32,17 +33,9 @@ function App() {
     const body = {
       bot_model: {
         bot_profile: "natural_conversation_2024_11",
-        tts: {
-          service: "cartesia"
-        },
-        stt: {
-          model: "deepgram",
-          language: "en"
-        },
-        llm: {
-          service: "anthropic",
-          model: "gpt-4"
-        }
+        tts: { service: "cartesia" },
+        stt: { model: "deepgram", language: "en" },
+        llm: { service: "anthropic", model: "gpt-4" }
       },
       max_duration: 300,
       customer_name: "John Doe",
@@ -52,24 +45,12 @@ function App() {
     };
 
     try {
-      const endpoint = `http://127.0.0.1:8000/api/createRoom/${formData.selectedBot}`;
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setRoomURL(data.roomURL);
-      } else {
-        setRoomURL('Error creating room');
-      }
+      const data = await createRoom(formData.selectedBot, body);
+      setRoomURL(data.roomURL);
     } catch (error) {
       setRoomURL('Error: ' + error.message);
     }
   };
-
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
       <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
